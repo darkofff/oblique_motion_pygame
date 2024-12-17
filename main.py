@@ -16,8 +16,6 @@ GRAVITY = -9.81
 running = True # Dla pętli
 """ x, y = 0, 600 """
 
-
-
 # SETUP
 screen = py.display.set_mode((WIDTH, HEIGHT))
 font = py.font.SysFont(None, 24)
@@ -84,6 +82,8 @@ tick = 0
 
 # --- GAME STATE 2 START ---
 
+positions_array = []
+
 x_filnal_pos = 0
 y_filnal_pos = 0
 
@@ -98,10 +98,8 @@ reset_button_text = font.render("RESET", True, (0, 0, 0))
 
 # --- GAME STATE 2 END ---
 
-
 # ZEGAR
 clock = py.time.Clock()
-
 
 while running:
     
@@ -144,7 +142,6 @@ while running:
                 """ print('angle: ', float(angle))
                 print('velocity: ', float(velocity)) """
 
-
             case 2:
                 if event.type == py.MOUSEBUTTONDOWN:
                     if reset_button_rect.collidepoint(event.pos):
@@ -159,6 +156,7 @@ while running:
                         total_distance = 0
                         x_for_max_height = 0
                         max_height = 0
+                        positions_array = []
                         game_state = 0
        
 
@@ -230,11 +228,14 @@ while running:
             x_pos, y_pos, has_landed, velocity_tuple = ball.update(float(velocity), float(angle), tick, meter_size)
             screen.blit(ball.image, ball.rect)
 
+            positions_array.append((x_pos, y_pos))
+
             x_filnal_pos = x_pos
             y_filnal_pos = y_pos
+            
+            for tuple in  positions_array:
+                py.draw.circle(screen, BLACK, tuple, 2)
 
-            
-            
             tick+=1
 
             if has_landed:
@@ -244,12 +245,13 @@ while running:
                 
                 x_for_max_height = (velocity_x * velocity_y)/(-GRAVITY)
                 max_height = velocity_y * (x_for_max_height/velocity_x) - 0.5 * (-GRAVITY) * ((x_for_max_height**2)/(velocity_x**2))
-              
-
                 
                 game_state = 2
         case 2: 
             py.draw.circle(screen, BLACK, (x_filnal_pos, y_filnal_pos), BALL_RADIUS)
+
+            for tuple in  positions_array:
+                py.draw.circle(screen, BLACK, tuple, 2)
 
             total_time_display = font.render(f"Całkowity czas lotu: {round(time_total, 4)} s", True, (0, 0, 0))
             screen.blit(total_time_display, (20, 535))
@@ -265,11 +267,8 @@ while running:
         case _:
             running = False
 
-
-    
     py.display.update()
     clock.tick(60)
-
 
 py.quit()
 sys.exit()
