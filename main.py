@@ -35,9 +35,6 @@ INPUT_SELECTED = (240, 240, 240)
 background = py.Surface((WIDTH, HEIGHT))
 background.fill(WHITE)
 
-ground = py.image.load("./img/ground.png")
-sky = py.image.load("./img/sky.png") # 800x300
-sky = py.transform.scale(sky, (1000, 500) )
 
 # GAME STATE
 # 0 - menu: wybór ustawień
@@ -92,10 +89,12 @@ y_filnal_pos = 0
 
 time_total = 0
 total_distance = 0
+
+x_for_max_height = 0
 max_height = 0
 
-# INPUTS
-
+reset_button_rect = py.Rect(400, 570, 70, 26)
+reset_button_text = font.render("RESET", True, (0, 0, 0)) 
 
 # --- GAME STATE 2 END ---
 
@@ -110,7 +109,7 @@ while running:
         # EXIT WINDOW
         if event.type == py.QUIT:
             running = False
-        
+
         match game_state:
             case 0:
                 # INPUTS
@@ -147,12 +146,25 @@ while running:
 
 
             case 2:
-                """ print('case 2') """
+                if event.type == py.MOUSEBUTTONDOWN:
+                    if reset_button_rect.collidepoint(event.pos):
+                        velocity_active = False
+                        angle_active = False
+                        grid_density_active = False
+                        meter_size_active = False
+                        tick = 0
+                        x_filnal_pos = 0
+                        y_filnal_pos = 0
+                        time_total = 0
+                        total_distance = 0
+                        x_for_max_height = 0
+                        max_height = 0
+                        game_state = 0
+       
 
     # BLIT UKŁAD WSPÓŁRZĘDNYCH
     screen.blit(background, (0, 0))
     
-   
     # Potrzebne żeby się nie wywalało jak się wyczyści input dla szerokości siatki. Ustala default na 10m
     grid_density_coefficient_int = int(grid_density_coefficient) if not grid_density_coefficient=="" else 10
     meter_size_int = int(meter_size) if not meter_size=="" else 5
@@ -229,18 +241,27 @@ while running:
                 velocity_x, velocity_y = velocity_tuple
                 time_total = (2*velocity_y)/-GRAVITY
                 total_distance = velocity_x * time_total
-                # max_height = 
+                
+                x_for_max_height = (velocity_x * velocity_y)/(-GRAVITY)
+                max_height = velocity_y * (x_for_max_height/velocity_x) - 0.5 * (-GRAVITY) * ((x_for_max_height**2)/(velocity_x**2))
+              
 
                 
                 game_state = 2
         case 2: 
-            py.draw.circle(screen, (0, 0, 0), (x_filnal_pos, y_filnal_pos), BALL_RADIUS)
+            py.draw.circle(screen, BLACK, (x_filnal_pos, y_filnal_pos), BALL_RADIUS)
 
             total_time_display = font.render(f"Całkowity czas lotu: {round(time_total, 4)} s", True, (0, 0, 0))
             screen.blit(total_time_display, (20, 535))
             
             total_distance_display = font.render(f"Odległość: {round(total_distance, 4)} m", True, (0, 0, 0))
             screen.blit(total_distance_display, (20, 575))
+           
+            total_height_display = font.render(f"Maksymalna wysokość: {round(max_height, 4)} m", True, (0, 0, 0))
+            screen.blit(total_height_display, (400, 535))
+
+            py.draw.rect(screen, GRAY, reset_button_rect )
+            screen.blit(reset_button_text, (reset_button_rect.x+5, reset_button_rect.y+5 ))
         case _:
             running = False
 
