@@ -93,7 +93,7 @@ total_distance = 0
 x_for_max_height = 0
 max_height = 0
 
-reset_button_rect = py.Rect(400, 570, 70, 26)
+reset_button_rect = py.Rect(350, 570, 70, 26)
 reset_button_text = font.render("RESET", True, (0, 0, 0)) 
 
 # --- GAME STATE 2 END ---
@@ -259,8 +259,8 @@ while running:
             total_distance_display = font.render(f"Odległość: {round(total_distance, 4)} m", True, (0, 0, 0))
             screen.blit(total_distance_display, (20, 575))
            
-            total_height_display = font.render(f"Maksymalna wysokość: {round(max_height, 4)} m", True, (0, 0, 0))
-            screen.blit(total_height_display, (400, 535))
+            total_height_display = font.render(f"Maksymalna wysokość: {round(max_height, 4)} m dla x = {round(x_for_max_height, 4)}", True, (0, 0, 0))
+            screen.blit(total_height_display, (350, 535))
 
             py.draw.rect(screen, GRAY, reset_button_rect )
             screen.blit(reset_button_text, (reset_button_rect.x+5, reset_button_rect.y+5 ))
